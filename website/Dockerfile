@@ -1,19 +1,16 @@
-# Use official PHP + Apache image
+# -----------Stage1--------------
+
 FROM php:8.2-apache
 
-# Enable Apache mod_rewrite (optional but common)
+WORKDIR /app
+
+COPY /website /var/www/html/
+
 RUN a2enmod rewrite
 
-# Install PHP extensions (add/remove based on your needs)
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+#RUN docker-php-ext-install mysqli
 
-# Copy project files into Apache document root
-COPY . /var/www/html/
-
-# Set correct permissions
 RUN chown -R www-data:www-data /var/www/html
+#CMD ["php", "-S", "0.0.0.0:8000", "index.php"]
 
-# Expose port 80
 EXPOSE 80
-
-# Apache starts automatically via base image
