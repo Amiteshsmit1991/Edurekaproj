@@ -1,0 +1,29 @@
+pipeline{
+    agent { label 'dev-server' }
+    stages{
+        stage("code clone"){
+            steps{
+            echo "Code clone stage"
+            git url: "https://github.com/Amiteshsmit1991/Edurekaproj.git", branch: "Devops"
+            }
+        }
+        stage("code build"){
+            steps{
+            echo "Code build stage"
+            sh 'echo "You are in: $(pwd)"'
+            sh "docker build -t php-helloworld /home/ubuntu/devops/workspace/Edureka-php_CICD/website"
+            }
+        }
+        stage("Image push to dockerhub"){
+            steps{
+            echo "Docker image push stage"
+            }
+        }
+        stage("code deploy"){
+            steps{
+            echo "Code deploy stage"
+            sh "docker run -d -p 8080:80 php-helloworld:latest"
+            }
+        }
+    }
+}
