@@ -1,0 +1,7 @@
+version: '3.9'
+
+services:
+  web:
+    image: amiteshsmit/php-helloworld:latest
+    ports:
+      - "8080:80"
