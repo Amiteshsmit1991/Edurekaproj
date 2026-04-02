@@ -7,6 +7,14 @@ pipeline{
             git url: "https://github.com/Amiteshsmit1991/Edurekaproj.git", branch: "Devops"
             }
         }
+        stage("Install Docker via Ansible") {
+            steps {
+                echo "Running Ansible playbook to install Docker"
+                sh """
+                    ansible-playbook /home/ubuntu/devops/workspace/Edureka-php_CICD/website/Ansible_Playbook.yml
+                """
+            }
+        }
         stage("code build"){
             steps{
             echo "Code build stage"
@@ -17,12 +25,23 @@ pipeline{
         stage("Image push to dockerhub"){
             steps{
             echo "Docker image push stage"
+            withCredentials([usernamePassword(
+                    credentialsId:"dockerHubCreds",
+                    usernameVariable:"dockerHubUser", 
+                    passwordVariable:"dockerHubPass")]){
+                sh 'echo $dockerHubPass | docker login -u $dockerHubUser --password-stdin'
+                sh "docker image tag php-helloworld:latest ${env.dockerHubUser}/php-helloworld:latest"
+                sh "docker push ${env.dockerHubUser}/php-helloworld:latest"
+            }
             }
         }
         stage("code deploy"){
             steps{
             echo "Code deploy stage"
-            sh "docker run -d -p 8080:80 php-helloworld:latest"
+            sh 'echo "You are in: $(pwd)"'
+            dir('/home/ubuntu/devops/workspace/Edureka-php_CICD/website') {
+    sh "docker compose down && docker compose up -d --build"
+}
             }
         }
     }
