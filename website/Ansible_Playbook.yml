@@ -1,1 +1,24 @@
+---
+- name: Install Docker
+  hosts: devserver
+  become: yes
+
+  tasks:
+
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_check
+      ignore_errors: yes
+
+    - name: Docker already installed message
+      debug:
+        msg: "Docker is already installed on this server."
+      when: docker_check.rc == 0
+
+    - name: Install Docker based on server distribution
+      apt:
+        name: docker.io
+        state: latest
+        update_cache: yes
+      when: docker_check.rc != 0
 
